@@ -1,0 +1,12 @@
+﻿@model IEnumerable<EntityCore.ItemCategory>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Categoires</h2>
+
+@foreach(var item in Model)
+{
+    <li>@Html.ActionLink(item.Name,"ItemDetails","Store",new { id=item.Id},null)</li>
+}
+ 

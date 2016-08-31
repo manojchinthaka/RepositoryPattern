@@ -1,0 +1,103 @@
+﻿@model ShoppingCart.ViewModels.ShoppingCartViewModel
+@{
+    ViewBag.Title = "Index";
+}
+<script src="~/Scripts/jquery-1.10.2.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function () {
+        // Document.ready -> link up remove event handler
+        $(".RemoveLink").click(function () {
+            // Get the id from the link
+            var recordToDelete = $(this).attr("data-id");
+
+            if (recordToDelete != '') {
+
+                // Perform the ajax post
+                //$.post("/ShoppingCart/RemoveFromCart", { "id": recordToDelete },
+                //    function (data) {
+                //        // Successful requests get here
+                //        // Update the page elements
+                //        if (data.ItemCount == 0) {
+                //            $('#row-' + data.DeleteId).fadeOut('slow');
+                //        } else {
+                //            $('#item-count-' + data.DeleteId).text(data.ItemCount);
+                //        }
+
+                //        $('#cart-total').text(data.CartTotal);
+                //        $('#update-message').text(data.Message);
+                //        $('#cart-status').text('Cart (' + data.CartCount + ')');
+                //    });
+
+
+
+                var formData = JSON.stringify(jQuery('#infoForm').serializeArray());
+                $.ajax({
+                    url: "/ShoppingCart/RemoveFromCart",
+                    type: "POST",
+                    data: { id: recordToDelete },
+                    dataType: "json",
+                    success: function (result) {
+                        alert('Message has been sent');
+                        $('#cartLoader').load('/ShoppingCart/Index', function (html)
+                        { $('#cartLoader').value = html; });
+                    },
+                    error: function (response) {
+                        alert("Error occured while sending the message");//
+                    }
+                });
+
+            }
+        });
+
+    });
+ 
+</script>
+<div id="cartLoader">
+    <h3>
+        <em>Review</em> your cart:
+    </h3>
+
+    <p class="button">
+        @Html.ActionLink("Checkout >>", "AddressAndPayment", "Checkout")
+    </p>
+
+    <table class="table">
+        <tr>
+            <th>Image</th>
+            <th>Item Name </th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.CartItems)
+        {
+            <tr>
+                <td>
+                    <img src="@Url.Content(item.ItemMaster.imagePath)" alt="Image" />
+                </td>
+                <td>
+                    @Html.ActionLink(item.ItemMaster.ItemCode, "Details", "Item", new { id = item.ItemId }, null)
+                </td>
+                <td>
+                    @item.ItemMaster.Price
+                </td>
+                <td>
+                    @item.Count
+                </td>
+                <td>
+                    <a href="#" class="RemoveLink" data-id="@item.RecordId">Remove from cart</a>
+                </td>
+
+            </tr>
+        }
+
+        <tr>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td>@Model.CartTotal</td>
+        </tr>
+    </table>
+</div>
